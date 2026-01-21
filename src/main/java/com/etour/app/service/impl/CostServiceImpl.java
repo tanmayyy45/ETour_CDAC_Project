@@ -1,9 +1,9 @@
-package com.etour.app.service;
+package com.etour.app.service.impl;
 
 import com.etour.app.entity.CostMaster;
 import com.etour.app.repository.CostRepository;
 
-import com.etour.app.service.impl.CostService;
+import com.etour.app.service.CostService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import java.util.Optional;
 @Service
 public class CostServiceImpl implements CostService {
 	@Autowired
-    private CostRepository costRepository;
+	private CostRepository costRepository;
 
 	@Override
 	public List<CostMaster> getAllCosts() {
@@ -32,11 +32,7 @@ public class CostServiceImpl implements CostService {
 	public void deleteCost(int id) {
 		// TODO Auto-generated method stub
 		costRepository.deleteById(id);
-		
+
 	}
 
-		
-	
-	
-   
-    }
+}

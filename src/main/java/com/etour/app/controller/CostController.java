@@ -2,7 +2,7 @@ package com.etour.app.controller;
 
 import com.etour.app.entity.CostMaster;
 // Make sure this import points to your actual Interface
-import com.etour.app.service.impl.CostService; 
+import com.etour.app.service.CostService; 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

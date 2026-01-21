@@ -1,4 +1,4 @@
-package com.etour.app.service.impl;
+package com.etour.app.service;
 
 import com.etour.app.entity.CostMaster;
 import java.util.List;
