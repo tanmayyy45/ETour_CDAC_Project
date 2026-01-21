@@ -77,14 +77,10 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Hibernate Core -->
-        <!-- Source: https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+        <!-- Spring Security for BCrypt password encoding -->
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>6.0.0.Final</version>
-            <type>pom</type>
-            <scope>compile</scope>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
         </dependency>
 
     </dependencies>
