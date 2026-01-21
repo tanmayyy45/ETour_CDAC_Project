@@ -1,5 +1,11 @@
 package com.etour.app.service;
 
-public interface CategoryService {
+import java.util.List;
 
+import com.etour.app.entity.CategoryMaster;
+
+public interface CategoryService {
+	List<CategoryMaster> getMainCategories();
+	
+	Object handleCategoryClick(String categoryId);
 }
