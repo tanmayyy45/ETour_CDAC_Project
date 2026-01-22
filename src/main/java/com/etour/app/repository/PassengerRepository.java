@@ -1,19 +1,23 @@
 package com.etour.app.repository;
 
-import com.etour.app.entity.PassengerMaster;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
-@Repository
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.etour.app.entity.PassengerMaster;
+
 public interface PassengerRepository extends JpaRepository<PassengerMaster, Integer> {
 
-    // ✅ Native query (no HQL parsing, so no ANTLR issue)
-    @Query(value = "SELECT * FROM passenger_master WHERE booking_id = :bid", nativeQuery = true)
-    List<PassengerMaster> findPassengersByBookingId(@Param("bid") int bookingId);
+    // Fetch passengers for booking (Native = avoids Hibernate parser issue)
+    @Query(value = "SELECT * FROM passenger_master WHERE booking_id = :bookingId", nativeQuery = true)
+    List<PassengerMaster> getPassengersByBookingId(@Param("bookingId") Integer bookingId);
 
-    List<PassengerMaster> findByPassengerType(String passengerType);
+    // Delete old passengers before re-inserting
+    @Modifying
+    @Query(value = "DELETE FROM passenger_master WHERE booking_id = :bookingId", nativeQuery = true)
+    void deletePassengersByBookingId(@Param("bookingId") Integer bookingId);
+
 }

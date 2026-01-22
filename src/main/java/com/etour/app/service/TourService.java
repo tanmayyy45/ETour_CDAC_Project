@@ -1,13 +1,5 @@
 package com.etour.app.service;
 
-import java.util.List;
+public interface TourService {
 
-import com.etour.app.entity.TourMaster;
-
-public interface TourService 
-{
-    List<TourMaster> getAllTours();
-    TourMaster getTourById(int id);
-    TourMaster addTour(TourMaster tourMaster);
-    void deleteTour(int id);
 }
