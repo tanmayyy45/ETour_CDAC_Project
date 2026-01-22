@@ -2,6 +2,7 @@ package com.etour.app.service;
 
 import java.util.List;
 
+import com.etour.app.dto.TourDTO;
 import com.etour.app.entity.TourMaster;
 
 public interface TourService 
@@ -10,4 +11,6 @@ public interface TourService
     TourMaster getTourById(int id);
     TourMaster addTour(TourMaster tourMaster);
     void deleteTour(int id);
+    TourDTO getTourDetailsByCategoryId(int catmasterId);
+
 }
