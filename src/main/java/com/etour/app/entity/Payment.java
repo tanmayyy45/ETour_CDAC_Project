@@ -31,6 +31,11 @@ public class Payment {
 
     @Column(name = "paid_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal paidAmount;
+    
+    @PrePersist
+    public void prePersist() {
+        this.paymentDate = Instant.now();
+    }
 
     public Integer getId() {
         return id;
