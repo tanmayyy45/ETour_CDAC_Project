@@ -2,20 +2,19 @@ package com.etour.app.service;
 
 import java.util.List;
 
-import com.etour.app.entity.Payment;
+import com.etour.app.dto.PaymentDTO;
 
 public interface PaymentService {
 
-    Payment addPayment(Payment payment);
+    PaymentDTO addPayment(PaymentDTO dto);
 
-    Payment getPaymentById(Integer id);
+    PaymentDTO getPaymentById(Integer id);
 
-    List<Payment> getPaymentsByBooking(Integer bookingId);
+    List<PaymentDTO> getPaymentsByBooking(Integer bookingId);
 
-    Payment updatePaymentStatus(Integer id, String status);
-    
-    Payment getPaymentByTransactionId(String transactionId);
+    PaymentDTO updatePaymentStatus(Integer id, String status);
+
+    PaymentDTO getPaymentByTransactionId(String transactionId);
 
     void deletePayment(Integer id);
 }
-

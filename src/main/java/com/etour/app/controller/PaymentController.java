@@ -3,7 +3,8 @@ package com.etour.app.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
-import com.etour.app.entity.Payment;
+
+import com.etour.app.dto.PaymentDTO;
 import com.etour.app.service.PaymentService;
 
 @RestController
@@ -18,28 +19,28 @@ public class PaymentController {
     }
 
     @PostMapping
-    public Payment addPayment(@RequestBody Payment payment) {
-        return paymentService.addPayment(payment);
+    public PaymentDTO addPayment(@RequestBody PaymentDTO dto) {
+        return paymentService.addPayment(dto);
     }
 
     @GetMapping("/{id}")
-    public Payment getPayment(@PathVariable Integer id) {
+    public PaymentDTO getPayment(@PathVariable Integer id) {
         return paymentService.getPaymentById(id);
     }
 
     @GetMapping("/booking/{bookingId}")
-    public List<Payment> getByBooking(@PathVariable Integer bookingId) {
+    public List<PaymentDTO> getByBooking(@PathVariable Integer bookingId) {
         return paymentService.getPaymentsByBooking(bookingId);
     }
 
     @PutMapping("/{id}/status/{status}")
-    public Payment updateStatus(@PathVariable Integer id,
-                                @PathVariable String status) {
+    public PaymentDTO updateStatus(@PathVariable Integer id,
+                                   @PathVariable String status) {
         return paymentService.updatePaymentStatus(id, status);
     }
-    
+
     @GetMapping("/transaction/{txn}")
-    public Payment getByTransaction(@PathVariable String txn) {
+    public PaymentDTO getByTransaction(@PathVariable String txn) {
         return paymentService.getPaymentByTransactionId(txn);
     }
 
@@ -49,4 +50,3 @@ public class PaymentController {
         return "Payment deleted successfully";
     }
 }
-

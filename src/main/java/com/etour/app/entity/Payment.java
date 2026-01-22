@@ -34,7 +34,9 @@ public class Payment {
     
     @PrePersist
     public void prePersist() {
-        this.paymentDate = Instant.now();
+        if (this.paymentDate == null) {
+            this.paymentDate = Instant.now();
+        }
     }
 
     public Integer getId() {

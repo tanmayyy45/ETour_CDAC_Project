@@ -4,50 +4,96 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.etour.app.dto.PaymentDTO;
+import com.etour.app.entity.BookingHeader;
 import com.etour.app.entity.Payment;
+import com.etour.app.repository.BookingHeaderRepository;
 import com.etour.app.repository.PaymentRepository;
 import com.etour.app.service.PaymentService;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
-    private final PaymentRepository paymentRepository;
+    private final PaymentRepository paymentRepo;
+    private final BookingHeaderRepository bookingRepository;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository) {
-        this.paymentRepository = paymentRepository;
+    public PaymentServiceImpl(PaymentRepository paymentRepo,
+                              BookingHeaderRepository bookingRepo) {
+        this.paymentRepo = paymentRepo;
+        this.bookingRepository = bookingRepo;
     }
 
     @Override
-    public Payment addPayment(Payment payment) {
-        return paymentRepository.save(payment);
+    public PaymentDTO addPayment(PaymentDTO dto) {
+
+        if (dto.getBookingId() == null) {
+            throw new RuntimeException("Booking ID is required");
+        }
+
+        BookingHeader booking = bookingRepository.findById(dto.getBookingId())
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        Payment p = new Payment();
+        p.setBooking(booking);
+        p.setTransactionId(dto.getTransactionId());
+        p.setPaymentMode(dto.getPaymentMode());
+        p.setPaymentStatus(dto.getPaymentStatus());
+        p.setPaidAmount(dto.getPaidAmount());
+
+        Payment saved = paymentRepo.save(p);
+
+        dto.setId(saved.getId());
+        dto.setPaymentDate(saved.getPaymentDate());
+
+        return dto;
     }
 
     @Override
-    public Payment getPaymentById(Integer id) {
-        return paymentRepository.findById(id)
+    public PaymentDTO getPaymentById(Integer id) {
+        return toDTO(paymentRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Payment not found")));
+    }
+
+    @Override
+    public List<PaymentDTO> getPaymentsByBooking(Integer bookingId) {
+        return paymentRepo.findByBookingId(bookingId)
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    @Override
+    public PaymentDTO updatePaymentStatus(Integer id, String status) {
+        Payment p = paymentRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
-    }
-
-    @Override
-    public List<Payment> getPaymentsByBooking(Integer bookingId) {
-        return paymentRepository.findByBookingId(bookingId);
-    }
-
-    @Override
-    public Payment updatePaymentStatus(Integer id, String status) {
-        Payment p = getPaymentById(id);
         p.setPaymentStatus(status);
-        return paymentRepository.save(p);
+        return toDTO(paymentRepo.save(p));
     }
-    
+
     @Override
-    public Payment getPaymentByTransactionId(String transactionId) {
-        return paymentRepository.findByTransactionId(transactionId);
+    public PaymentDTO getPaymentByTransactionId(String transactionId) {
+        return toDTO(paymentRepo.findByTransactionId(transactionId));
     }
 
     @Override
     public void deletePayment(Integer id) {
-        paymentRepository.deleteById(id);
+        if (!paymentRepo.existsById(id))
+            throw new RuntimeException("Payment not found");
+        paymentRepo.deleteById(id);
+    }
+
+    // ---------- conversion ----------
+    private PaymentDTO toDTO(Payment p) {
+        PaymentDTO dto = new PaymentDTO();
+        dto.setId(p.getId());
+        dto.setBookingId(p.getBooking().getId());
+        dto.setTransactionId(p.getTransactionId());
+        dto.setPaymentMode(p.getPaymentMode());
+        dto.setPaymentStatus(p.getPaymentStatus());
+        dto.setPaidAmount(p.getPaidAmount());
+        dto.setPaymentDate(p.getPaymentDate());
+        return dto;
     }
 }
+
 
