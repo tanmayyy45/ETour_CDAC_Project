@@ -1,5 +1,7 @@
 package com.etour.app.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,5 +11,6 @@ import com.etour.app.entity.ItineraryMaster;
 public interface ItinerarryRepository extends JpaRepository<ItineraryMaster, Integer>{
 
 	
-	
+	List<ItineraryMaster> findByCatmasterIdOrderByDayNumberAsc(Integer catmasterId);
+
 }

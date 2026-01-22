@@ -14,4 +14,6 @@ public interface DepartureDateRepository extends JpaRepository<DepartureDateMast
     List<DepartureDateMaster> findByDepartureDateGreaterThanEqual(LocalDate date);
 
     List<DepartureDateMaster> findByDepartureDateBetween(LocalDate startDate, LocalDate endDate);
+    
+   
 }
