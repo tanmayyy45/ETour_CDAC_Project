@@ -1,0 +1,15 @@
+export { default as ShowcasePage } from './ShowcasePage';
+export { default as HomePage } from './HomePage';
+export { default as SubSectorPage } from './SubSectorPage';
+export { default as ProductPage } from './ProductPage';
+export { default as TourDetailPage } from './TourDetailPage';
+export { default as SearchPage } from './SearchPage';
+export { default as BookingPage } from './BookingPage';
+export { default as AboutPage } from './AboutPage';
+export { default as TermsPage } from './TermsPage';
+export { default as FeedbackPage } from './FeedbackPage';
+export { default as GalleryPage } from './GalleryPage';
+export { default as VideosPage } from './VideosPage';
+export { default as DownloadPage } from './DownloadPage';
+export { default as LoginPage } from './LoginPage';
+export { default as RegisterPage } from './RegisterPage';
