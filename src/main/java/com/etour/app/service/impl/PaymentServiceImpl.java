@@ -18,11 +18,12 @@ public class PaymentServiceImpl implements PaymentService {
     private final BookingHeaderRepository bookingRepository;
 
     public PaymentServiceImpl(PaymentRepository paymentRepo,
-                              BookingHeaderRepository bookingRepo) {
+                              BookingHeaderRepository bookingRepository) {
         this.paymentRepo = paymentRepo;
-        this.bookingRepository = bookingRepo;
+        this.bookingRepository = bookingRepository;
     }
 
+    // ================= ADD PAYMENT =================
     @Override
     public PaymentDTO addPayment(PaymentDTO dto) {
 
@@ -42,18 +43,17 @@ public class PaymentServiceImpl implements PaymentService {
 
         Payment saved = paymentRepo.save(p);
 
-        dto.setId(saved.getId());
-        dto.setPaymentDate(saved.getPaymentDate());
-
-        return dto;
+        return toDTO(saved);
     }
 
+    // ================= GET BY ID =================
     @Override
     public PaymentDTO getPaymentById(Integer id) {
         return toDTO(paymentRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Payment not found")));
     }
 
+    // ================= GET BY BOOKING =================
     @Override
     public List<PaymentDTO> getPaymentsByBooking(Integer bookingId) {
         return paymentRepo.findByBookingId(bookingId)
@@ -62,6 +62,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .toList();
     }
 
+    // ================= UPDATE STATUS =================
     @Override
     public PaymentDTO updatePaymentStatus(Integer id, String status) {
         Payment p = paymentRepo.findById(id)
@@ -70,19 +71,28 @@ public class PaymentServiceImpl implements PaymentService {
         return toDTO(paymentRepo.save(p));
     }
 
+    // ================= GET BY TRANSACTION =================
     @Override
     public PaymentDTO getPaymentByTransactionId(String transactionId) {
-        return toDTO(paymentRepo.findByTransactionId(transactionId));
+        Payment p = paymentRepo.findByTransactionId(transactionId);
+
+        if (p == null) {
+            throw new RuntimeException("Payment not found for transaction id: " + transactionId);
+        }
+
+        return toDTO(p);
     }
 
+    // ================= DELETE =================
     @Override
     public void deletePayment(Integer id) {
-        if (!paymentRepo.existsById(id))
+        if (!paymentRepo.existsById(id)) {
             throw new RuntimeException("Payment not found");
+        }
         paymentRepo.deleteById(id);
     }
 
-    // ---------- conversion ----------
+    // ================= ENTITY → DTO =================
     private PaymentDTO toDTO(Payment p) {
         PaymentDTO dto = new PaymentDTO();
         dto.setId(p.getId());
@@ -95,5 +105,3 @@ public class PaymentServiceImpl implements PaymentService {
         return dto;
     }
 }
-
-
