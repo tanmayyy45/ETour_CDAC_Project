@@ -9,7 +9,7 @@ import com.etour.app.entity.DepartureDateMaster;
 
 public interface DepartureDateRepository extends JpaRepository<DepartureDateMaster, Integer> {
 
-    List<DepartureDateMaster> findByCatmasterId(int catmasterId);
+    List<DepartureDateMaster> findByCatmaster_Id(int catmasterId);
 
     List<DepartureDateMaster> findByDepartureDateGreaterThanEqual(LocalDate date);
 

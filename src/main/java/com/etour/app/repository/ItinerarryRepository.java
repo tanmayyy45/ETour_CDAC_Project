@@ -11,6 +11,6 @@ import com.etour.app.entity.ItineraryMaster;
 public interface ItinerarryRepository extends JpaRepository<ItineraryMaster, Integer>{
 
 	
-	List<ItineraryMaster> findByCatmasterIdOrderByDayNumberAsc(Integer catmasterId);
+	List<ItineraryMaster> findByCatmaster_IdOrderByDayNumberAsc(Integer catmasterId);
 
 }

@@ -29,6 +29,7 @@ public class ItineraryController {
         return ResponseEntity.ok(itineraryService.getItineraryById(id));
     }
 
+
 //    @GetMapping("/category/{catmasterId}")
 //    public ResponseEntity<List<ItineraryMaster>> getByCategory(
 //            @PathVariable Integer catmasterId) {

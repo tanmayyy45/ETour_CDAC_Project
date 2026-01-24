@@ -9,6 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CostRepository extends JpaRepository<CostMaster, Integer> {
-    // You can add custom queries here if needed, for example:
-    List<CostMaster> findByCatmasterId(Integer catId);
+    List<CostMaster> findByCatmaster_Id(Integer catmasterId);
 }

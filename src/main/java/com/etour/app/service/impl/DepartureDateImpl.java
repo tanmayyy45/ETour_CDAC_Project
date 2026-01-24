@@ -43,7 +43,7 @@ public class DepartureDateImpl implements DepartureService {
 
     @Override
     public List<DepartureDateMaster> getDeparturesByCategory(int catmasterId) {
-        return repo.findByCatmasterId(catmasterId);
+        return repo.findByCatmaster_Id(catmasterId);
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.etour.app.dto.CategoryClickResponseDTO;
 import com.etour.app.entity.CategoryMaster;
 import com.etour.app.service.CategoryService;
 
@@ -27,7 +28,7 @@ public class CategoryController {
 	
 	
 	@GetMapping("/{categoryId}")
-	public ResponseEntity<?> handleCategoryClick(@PathVariable String categoryId)
+	public ResponseEntity<CategoryClickResponseDTO> handleCategoryClick(@PathVariable String categoryId)
 	{
 		return ResponseEntity.ok(categoryService.handleCategoryClick(categoryId));
 	}
