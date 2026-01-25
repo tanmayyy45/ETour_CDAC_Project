@@ -1,266 +1,411 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { PageLayout } from '../components/layout';
-import { TourCard, CategoryCard, LanguageSelector, AdBanner } from '../components/common';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import {
+    MapPin, Plane, Mountain, Heart, Users, Globe,
+    Compass, Camera, Sun, ArrowRight, Star, TrendingUp, Clock
+} from 'lucide-react';
+import Navbar from '../components/layout/Navbar';
+import Footer from '../components/layout/Footer';
+import Ticker from '../components/features/Ticker';
+import { categoryAPI, tourAPI } from '../services/api';
 
-const HomePage = () => {
-    const navigate = useNavigate();
-    const [destination, setDestination] = useState('');
-    const [language, setLanguage] = useState('en');
+// Icon mapping for categories from backend
+const iconMap = {
+    'domestic': MapPin,
+    'international': Plane,
+    'adventure': Mountain,
+    'honeymoon': Heart,
+    'group': Users,
+    'pilgrimage': Sun,
+    'wildlife': Compass,
+    'photography': Camera,
+    'default': Globe,
+};
 
-    // Sample data - will be replaced by API calls
-    const mainSectors = [
-        { id: 'domestic', name: 'Domestic Tours', icon: '🏔️', tourCount: 45 },
-        { id: 'international', name: 'International Tours', icon: '✈️', tourCount: 32 },
-        { id: 'adventure', name: 'Adventure Tours', icon: '🎿', tourCount: 18 },
-        { id: 'honeymoon', name: 'Couple Tours', icon: '💑', tourCount: 24 },
-        { id: 'sports', name: 'Sports Tourism', icon: '⚽', tourCount: 12 },
-        { id: 'religious', name: 'Religious Tours', icon: '🛕', tourCount: 28 },
-        { id: 'beach', name: 'Beach Holidays', icon: '🏖️', tourCount: 20 },
-        { id: 'wildlife', name: 'Wildlife Safari', icon: '🦁', tourCount: 15 },
-    ];
+const gradientMap = {
+    'domestic': 'from-blue-500 to-cyan-400',
+    'international': 'from-purple-500 to-pink-400',
+    'adventure': 'from-orange-500 to-amber-400',
+    'honeymoon': 'from-rose-500 to-pink-400',
+    'group': 'from-green-500 to-emerald-400',
+    'pilgrimage': 'from-amber-500 to-yellow-400',
+    'wildlife': 'from-teal-500 to-green-400',
+    'photography': 'from-indigo-500 to-blue-400',
+    'default': 'from-gray-500 to-gray-400',
+};
 
-    const featuredTours = [
-        { id: 1, title: 'Kashmir Paradise', location: 'Srinagar, India', duration: '6N/7D', price: 25000, rating: 4.8, reviewCount: 124, badge: 'Best Seller' },
-        { id: 2, title: 'Kerala Backwaters', location: 'Alleppey, India', duration: '5N/6D', price: 18000, rating: 4.7, reviewCount: 98 },
-        { id: 3, title: 'Goa Beach Escape', location: 'North Goa, India', duration: '4N/5D', price: 15000, rating: 4.6, reviewCount: 156 },
-        { id: 4, title: 'Rajasthan Heritage', location: 'Jaipur, India', duration: '7N/8D', price: 32000, rating: 4.9, reviewCount: 87, badge: 'Premium' },
-    ];
+export default function HomePage() {
+    const [categories, setCategories] = useState([]);
+    const [tours, setTours] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        navigate(`/search?destination=${encodeURIComponent(destination)}`);
+    useEffect(() => {
+        const loadData = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const [catRes, tourRes] = await Promise.allSettled([
+                    categoryAPI.getMainCategories(),
+                    tourAPI.getAllTours(),
+                ]);
+
+                if (catRes.status === 'fulfilled' && catRes.value.data) {
+                    setCategories(catRes.value.data);
+                } else {
+                    console.error('Failed to load categories');
+                }
+
+                if (tourRes.status === 'fulfilled' && tourRes.value.data) {
+                    setTours(tourRes.value.data.slice(0, 4));
+                } else {
+                    console.error('Failed to load tours');
+                }
+            } catch (err) {
+                console.error('Error loading data:', err);
+                setError('Failed to load data from server');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
+    }, []);
+
+    const getCategoryIcon = (category) => {
+        const key = category.categoryName?.toLowerCase() || 'default';
+        return iconMap[key] || iconMap['default'];
+    };
+
+    const getCategoryGradient = (category) => {
+        const key = category.categoryName?.toLowerCase() || 'default';
+        return gradientMap[key] || gradientMap['default'];
     };
 
     return (
-        <PageLayout
-            showCrawl={true}
-            crawlText="🎉 Special Offer! Get 20% off on all Domestic Tours this month. Book now! | New International packages added for Europe and Southeast Asia. | Customer Support: 1800-123-4567"
-        >
+        <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}
-            <section className="home-hero">
-                <div className="home-hero-background">
-                    <img
-                        src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920&q=80"
-                        alt="Beautiful landscape"
-                    />
+            <section className="relative min-h-screen flex items-center">
+                {/* Background Image */}
+                <div className="absolute inset-0 z-0">
+                    <div className="w-full h-full bg-gradient-dark" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
                 </div>
-                <div className="home-hero-content">
-                    <h1 className="home-hero-title">
-                        Life is short and the world is wide
-                    </h1>
-                    <p className="home-hero-subtitle">
-                        Discover amazing destinations with our curated tour packages.
-                        Your dream vacation starts here.
-                    </p>
 
-                    {/* Search Box */}
-                    <form className="home-search-box" onSubmit={handleSearch}>
-                        <input
-                            type="text"
-                            placeholder="Where do you want to go?"
-                            value={destination}
-                            onChange={(e) => setDestination(e.target.value)}
-                            className="home-search-field"
-                            style={{ minWidth: '250px' }}
-                        />
-                        <input
-                            type="date"
-                            className="home-search-field"
-                            placeholder="Check In"
-                        />
-                        <input
-                            type="date"
-                            className="home-search-field"
-                            placeholder="Check Out"
-                        />
-                        <button type="submit" className="btn btn-primary">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <circle cx="11" cy="11" r="8" />
-                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                            </svg>
-                            Search
-                        </button>
-                    </form>
+                {/* Navbar */}
+                <Navbar />
 
-                    {/* Language Selector */}
-                    <div className="mt-6">
-                        <LanguageSelector
-                            currentLanguage={language}
-                            onLanguageChange={setLanguage}
-                        />
+                {/* Hero Content */}
+                <div className="container mx-auto px-4 relative z-10 pt-20">
+                    <div className="max-w-3xl">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium mb-6">
+                                <TrendingUp size={16} className="text-orange-400" />
+                                Your Trusted Travel Partner
+                            </span>
+
+                            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                                Discover Your Next{' '}
+                                <span className="bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
+                                    Adventure
+                                </span>
+                            </h1>
+
+                            <p className="text-xl text-white/80 mb-8 leading-relaxed max-w-2xl">
+                                Explore incredible destinations with our expertly curated tour packages.
+                            </p>
+
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <Link
+                                    to="/tours"
+                                    className="btn-accent px-8 py-4 text-lg inline-flex items-center justify-center gap-2 hover:scale-105 transition-transform"
+                                >
+                                    Explore Tours <ArrowRight size={20} />
+                                </Link>
+                                <Link
+                                    to="/search"
+                                    className="px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/30 rounded-xl text-white font-semibold hover:bg-white/20 transition-all inline-flex items-center justify-center gap-2"
+                                >
+                                    <Globe size={20} />
+                                    Search Packages
+                                </Link>
+                            </div>
+                        </motion.div>
                     </div>
                 </div>
+
+                {/* Scroll Indicator */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1 }}
+                    className="absolute bottom-8 left-1/2 -translate-x-1/2"
+                >
+                    <motion.div
+                        animate={{ y: [0, 10, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                        className="w-6 h-10 border-2 border-white/40 rounded-full flex justify-center pt-2"
+                    >
+                        <div className="w-1.5 h-3 bg-white/60 rounded-full" />
+                    </motion.div>
+                </motion.div>
             </section>
 
-            {/* Sectors Section */}
-            <section className="sectors-section">
-                <div className="container">
-                    <h2 className="section-title">Find Your Next Dream Destination</h2>
-                    <p className="section-subtitle">
-                        Explore our curated selection of tour categories designed for every type of traveler
-                    </p>
+            {/* Ticker */}
+            <Ticker />
 
-                    <div className="sectors-grid stagger">
-                        {mainSectors.map((sector) => (
-                            <CategoryCard
-                                key={sector.id}
-                                id={sector.id}
-                                name={sector.name}
-                                icon={sector.icon}
-                                tourCount={sector.tourCount}
-                            />
-                        ))}
-                    </div>
+            {/* Main Sectors Section */}
+            <section className="py-20 bg-white">
+                <div className="container mx-auto px-4">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="text-center mb-12"
+                    >
+                        <span className="inline-block px-4 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium mb-4">
+                            Browse Categories
+                        </span>
+                        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                            Explore Tour Categories
+                        </h2>
+                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                            Choose from our wide range of tour categories
+                        </p>
+                    </motion.div>
+
+                    {isLoading ? (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            {[...Array(8)].map((_, i) => (
+                                <div key={i} className="skeleton h-40 rounded-2xl" />
+                            ))}
+                        </div>
+                    ) : categories.length > 0 ? (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            {categories.map((category, index) => {
+                                const IconComponent = getCategoryIcon(category);
+                                return (
+                                    <motion.div
+                                        key={category.id || index}
+                                        initial={{ opacity: 0, y: 30 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: index * 0.1 }}
+                                    >
+                                        <Link
+                                            to={`/sector/${category.categoryId}`}
+                                            className="sector-card group block"
+                                        >
+                                            <div className={`icon bg-gradient-to-br ${getCategoryGradient(category)}`}>
+                                                <IconComponent className="w-full h-full text-white" />
+                                            </div>
+                                            <h3 className="title">{category.categoryName}</h3>
+                                            <span className="mt-2 text-sm text-gray-500 group-hover:text-blue-600 transition-colors flex items-center gap-1">
+                                                Explore <ArrowRight size={14} />
+                                            </span>
+                                        </Link>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12">
+                            <p className="text-gray-500 text-lg">No categories available. Please check backend connection.</p>
+                        </div>
+                    )}
                 </div>
             </section>
 
             {/* Featured Tours Section */}
-            <section className="featured-section">
-                <div className="container">
-                    <div className="featured-header">
+            <section className="py-20 bg-gray-50">
+                <div className="container mx-auto px-4">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="flex flex-col md:flex-row md:items-end md:justify-between mb-12"
+                    >
                         <div>
-                            <h2>Best Travel Destinations</h2>
-                            <p className="text-secondary mt-2">Handpicked tours loved by our travelers</p>
-                        </div>
-                        <Link to="/tours" className="btn btn-outline">
-                            View All Tours
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <line x1="5" y1="12" x2="19" y2="12" />
-                                <polyline points="12 5 19 12 12 19" />
-                            </svg>
-                        </Link>
-                    </div>
-
-                    <div className="card-grid">
-                        {featuredTours.map((tour) => (
-                            <TourCard key={tour.id} {...tour} />
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Destination Highlight */}
-            <section className="destination-highlight">
-                <div className="container">
-                    <div className="destination-content">
-                        <div className="destination-image">
-                            <img
-                                src="https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=800&q=80"
-                                alt="Switzerland"
-                            />
-                        </div>
-                        <div className="destination-info">
-                            <h2>Switzerland</h2>
-                            <p>
-                                Experience the breathtaking beauty of the Swiss Alps, charming villages,
-                                and world-class hospitality. From skiing in winter to hiking in summer,
-                                Switzerland offers year-round adventures.
+                            <span className="inline-block px-4 py-1 bg-orange-50 text-orange-600 rounded-full text-sm font-medium mb-4">
+                                Popular Choices
+                            </span>
+                            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                                Featured Tour Packages
+                            </h2>
+                            <p className="text-lg text-gray-600 max-w-xl">
+                                Handpicked tours that travelers love the most
                             </p>
-                            <div className="destination-features">
-                                <div className="destination-feature">
-                                    <span className="destination-feature-icon">✓</span>
-                                    <span>Scenic Train Journeys</span>
-                                </div>
-                                <div className="destination-feature">
-                                    <span className="destination-feature-icon">✓</span>
-                                    <span>Alpine Adventures</span>
-                                </div>
-                                <div className="destination-feature">
-                                    <span className="destination-feature-icon">✓</span>
-                                    <span>Luxury Accommodations</span>
-                                </div>
-                                <div className="destination-feature">
-                                    <span className="destination-feature-icon">✓</span>
-                                    <span>Guided Tours</span>
-                                </div>
-                            </div>
-                            <Link to="/tours/international/switzerland" className="btn btn-primary">
-                                Explore Switzerland
-                            </Link>
                         </div>
-                    </div>
+                        <Link
+                            to="/tours"
+                            className="mt-6 md:mt-0 inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 transition-colors"
+                        >
+                            View All Tours <ArrowRight size={18} />
+                        </Link>
+                    </motion.div>
+
+                    {isLoading ? (
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {[...Array(4)].map((_, i) => (
+                                <div key={i} className="skeleton h-80 rounded-2xl" />
+                            ))}
+                        </div>
+                    ) : tours.length > 0 ? (
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {tours.map((tour, index) => (
+                                <motion.div
+                                    key={tour.catmasterId || tour.id || index}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: index * 0.1 }}
+                                >
+                                    <Link to={`/tour/${tour.catmasterId || tour.id}`} className="tour-card group block">
+                                        <div className="image-container">
+                                            <img
+                                                src={tour.thumbnailPath || '/placeholder-tour.jpg'}
+                                                alt={tour.tourName}
+                                                className="image"
+                                                onError={(e) => {
+                                                    e.target.src = 'https://via.placeholder.com/400x300?text=No+Image';
+                                                }}
+                                            />
+                                            <span className="duration-badge">{tour.duration || 'N/A'}</span>
+                                            <div className="price-badge">
+                                                <p className="price-label">Starting from</p>
+                                                <p className="price">₹{(tour.startingCost || 0).toLocaleString()}</p>
+                                            </div>
+                                        </div>
+                                        <div className="content">
+                                            <h3 className="title">{tour.tourName}</h3>
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <span className="flex items-center gap-1 text-gray-500">
+                                                    <Clock size={14} />
+                                                    {tour.duration || 'N/A'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                </motion.div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12">
+                            <p className="text-gray-500 text-lg">No tours available. Please check backend connection.</p>
+                        </div>
+                    )}
                 </div>
             </section>
 
-            {/* Why Choose Us */}
-            <section className="section" style={{ background: 'var(--bg-secondary)' }}>
-                <div className="container">
-                    <h2 className="section-title">We provide tours across a variety of destinations</h2>
-                    <p className="section-subtitle">
-                        Why thousands of travelers choose ETour for their adventures
-                    </p>
+            {/* Why Choose Us Section */}
+            <section className="py-20 bg-gradient-dark text-white">
+                <div className="container mx-auto px-4">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="text-center mb-12"
+                    >
+                        <span className="inline-block px-4 py-1 bg-white/10 rounded-full text-sm font-medium mb-4">
+                            Why ETour India
+                        </span>
+                        <h2 className="text-4xl font-bold mb-4">
+                            Why Travelers Choose Us
+                        </h2>
+                        <p className="text-lg text-white/70 max-w-2xl mx-auto">
+                            We go above and beyond to ensure your travel experience is nothing short of exceptional
+                        </p>
+                    </motion.div>
 
-                    <div className="grid grid-cols-4 md-grid-cols-2 sm-grid-cols-1 gap-6 mt-8">
+                    <div className="grid md:grid-cols-3 gap-8">
                         {[
-                            { icon: '🌍', title: '500+ Destinations', desc: 'Explore worldwide locations' },
-                            { icon: '⭐', title: 'Best Price Guarantee', desc: 'Get the best deals always' },
-                            { icon: '🎯', title: 'Expert Guides', desc: 'Professional tour leaders' },
-                            { icon: '💯', title: '24/7 Support', desc: 'We\'re always here to help' },
-                        ].map((item, index) => (
-                            <div key={index} className="card text-center p-6">
-                                <span style={{ fontSize: '3rem' }}>{item.icon}</span>
-                                <h3 className="mt-4 mb-2" style={{ fontSize: 'var(--font-size-lg)' }}>{item.title}</h3>
-                                <p className="text-tertiary" style={{ fontSize: 'var(--font-size-sm)' }}>{item.desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Testimonials */}
-            <section className="testimonials-section">
-                <div className="container">
-                    <h2 className="section-title">What our customers says</h2>
-                    <p className="section-subtitle">Real experiences from real travelers</p>
-
-                    <div className="grid grid-cols-3 md-grid-cols-2 sm-grid-cols-1 gap-6 mt-8">
-                        {[
-                            { name: 'Priya Sharma', role: 'Delhi', text: 'Amazing experience! The Kashmir tour was beyond our expectations. Well organized and great value.' },
-                            { name: 'Rahul Mehta', role: 'Mumbai', text: 'Best tour operator we\'ve ever used. The team was professional and the itinerary was perfect.' },
-                            { name: 'Anita Patel', role: 'Bangalore', text: 'Seamless booking process and excellent customer support. Will definitely book again!' },
-                        ].map((testimonial, index) => (
-                            <div key={index} className="testimonial-card">
-                                <div className="rating mb-3">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <span key={star} className="rating-star">★</span>
-                                    ))}
-                                </div>
-                                <p className="testimonial-text">"{testimonial.text}"</p>
-                                <div className="testimonial-author">
-                                    <div className="avatar">{testimonial.name.charAt(0)}</div>
-                                    <div>
-                                        <div className="testimonial-author-name">{testimonial.name}</div>
-                                        <div className="testimonial-author-role">{testimonial.role}</div>
-                                    </div>
-                                </div>
-                            </div>
+                            {
+                                icon: '🎯',
+                                title: 'Curated Experiences',
+                                description: 'Every tour is handpicked and designed by travel experts.',
+                            },
+                            {
+                                icon: '💰',
+                                title: 'Best Price Guarantee',
+                                description: 'We promise the most competitive prices.',
+                            },
+                            {
+                                icon: '🛡️',
+                                title: 'Safe & Secure',
+                                description: 'Your safety is our priority.',
+                            },
+                            {
+                                icon: '📞',
+                                title: '24/7 Support',
+                                description: 'Our support team is available round the clock.',
+                            },
+                            {
+                                icon: '✨',
+                                title: 'Flexible Booking',
+                                description: 'Free cancellation on most bookings.',
+                            },
+                            {
+                                icon: '🏆',
+                                title: 'Award Winning',
+                                description: 'Top tour operator for 5 consecutive years.',
+                            },
+                        ].map((feature, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: index * 0.1 }}
+                                className="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:bg-white/10 transition-colors"
+                            >
+                                <div className="text-4xl mb-4">{feature.icon}</div>
+                                <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                                <p className="text-white/70">{feature.description}</p>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
             </section>
 
             {/* CTA Section */}
-            <section className="cta-section">
-                <div className="container">
-                    <h2 className="cta-title">Start your next journey now and create memories that last forever</h2>
-                    <p className="cta-subtitle">
-                        Join thousands of happy travelers who have explored the world with us
-                    </p>
-                    <div className="flex gap-4 justify-center">
-                        <Link to="/tours" className="btn btn-lg" style={{ background: 'white', color: 'var(--primary-600)' }}>
-                            Browse Tours
-                        </Link>
-                        <Link to="/contact" className="btn btn-lg btn-outline" style={{ borderColor: 'white', color: 'white' }}>
-                            Contact Us
-                        </Link>
-                    </div>
+            <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+                <div className="container mx-auto px-4 text-center">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                    >
+                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                            Ready to Start Your Journey?
+                        </h2>
+                        <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+                            Join satisfied travelers who have explored the world with us
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <Link
+                                to="/tours"
+                                className="px-8 py-4 bg-white text-blue-600 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors inline-flex items-center justify-center gap-2"
+                            >
+                                Browse All Tours <ArrowRight size={20} />
+                            </Link>
+                            <Link
+                                to="/contact"
+                                className="px-8 py-4 bg-white/10 border border-white/30 text-white rounded-xl font-bold text-lg hover:bg-white/20 transition-colors"
+                            >
+                                Contact Us
+                            </Link>
+                        </div>
+                    </motion.div>
                 </div>
             </section>
 
-            {/* Side Ad Banners - These would be positioned fixed in a real implementation */}
-        </PageLayout>
+            {/* Footer */}
+            <Footer />
+        </div>
     );
-};
-
-export default HomePage;
+}

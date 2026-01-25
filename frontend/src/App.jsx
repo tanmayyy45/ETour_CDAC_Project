@@ -1,66 +1,81 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import {
-  ShowcasePage,
-  HomePage,
-  SubSectorPage,
-  ProductPage,
-  TourDetailPage,
-  SearchPage,
-  BookingPage,
-  AboutPage,
-  TermsPage,
-  FeedbackPage,
-  GalleryPage,
-  VideosPage,
-  DownloadPage,
-  LoginPage,
-  RegisterPage,
-} from './pages';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AppProvider } from './context/AppContext';
 
-import './styles/index.css';
+// Pages
+import ShowcasePage from './pages/ShowcasePage';
+import HomePage from './pages/HomePage';
+import ToursPage from './pages/ToursPage';
+import SectorPage from './pages/SectorPage';
+import TourDetailPage from './pages/TourDetailPage';
+import SearchPage from './pages/SearchPage';
+import BookingPage from './pages/BookingPage';
+import AboutPage from './pages/AboutPage';
+import GalleryPage from './pages/GalleryPage';
+import ContactPage from './pages/ContactPage';
+import LoginPage from './pages/LoginPage';
+import ProfilePage from './pages/ProfilePage';
+import MyBookingsPage from './pages/MyBookingsPage';
+import BookingDetailsPage from './pages/BookingDetailsPage';
+import NotFoundPage from './pages/NotFoundPage';
+
+// Admin Pages
+import AdminDashboard from './pages/admin/AdminDashboard';
+import ManageTours from './pages/admin/ManageTours';
+import ManageCosts from './pages/admin/ManageCosts';
+import UploadExcel from './pages/admin/UploadExcel';
+
+// Styles
+import './index.css';
 
 function App() {
-  return (
-    <Router>
-      <Routes>
-        {/* Entry Point - Showcase Page */}
-        <Route path="/" element={<ShowcasePage />} />
+    return (
+        <AppProvider>
+            <BrowserRouter>
+                <Routes>
+                    {/* Entry Point - Showcase/Splash */}
+                    <Route path="/" element={<ShowcasePage />} />
 
-        {/* Main Pages */}
-        <Route path="/home" element={<HomePage />} />
+                    {/* Main Home Page */}
+                    <Route path="/home" element={<HomePage />} />
 
-        {/* Tour Browsing */}
-        <Route path="/tours" element={<HomePage />} />
-        <Route path="/tours/:sectorId" element={<SubSectorPage />} />
-        <Route path="/tours/:sectorId/:subSectorId" element={<ProductPage />} />
+                    {/* Tour Browsing */}
+                    <Route path="/tours" element={<ToursPage />} />
+                    <Route path="/sector/:sectorId" element={<SectorPage />} />
+                    <Route path="/sector/:sectorId/:subsectorId" element={<SectorPage />} />
 
-        {/* Tour Detail */}
-        <Route path="/tour/:tourId" element={<TourDetailPage />} />
+                    {/* Tour Detail */}
+                    <Route path="/tour/:tourId" element={<TourDetailPage />} />
 
-        {/* Search */}
-        <Route path="/search" element={<SearchPage />} />
+                    {/* Search */}
+                    <Route path="/search" element={<SearchPage />} />
 
-        {/* Booking */}
-        <Route path="/booking/:tourId" element={<BookingPage />} />
+                    {/* Booking */}
+                    <Route path="/book/:tourId" element={<BookingPage />} />
 
-        {/* Static Pages */}
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/terms" element={<TermsPage />} />
-        <Route path="/contact" element={<FeedbackPage />} />
-        <Route path="/feedback" element={<FeedbackPage />} />
-        <Route path="/gallery" element={<GalleryPage />} />
-        <Route path="/videos" element={<VideosPage />} />
-        <Route path="/download" element={<DownloadPage />} />
+                    {/* Static Pages */}
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/gallery" element={<GalleryPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/login" element={<LoginPage />} />
 
-        {/* Authentication */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+                    {/* Customer Dashboard */}
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/my-bookings" element={<MyBookingsPage />} />
+                    <Route path="/booking/:bookingId" element={<BookingDetailsPage />} />
 
-        {/* Fallback - Redirect to showcase */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
-  );
+                    {/* Admin Panel */}
+                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/admin/tours" element={<ManageTours />} />
+                    <Route path="/admin/costs" element={<ManageCosts />} />
+                    <Route path="/admin/upload" element={<UploadExcel />} />
+
+                    {/* Fallback */}
+                    <Route path="/404" element={<NotFoundPage />} />
+                    <Route path="*" element={<Navigate to="/404" replace />} />
+                </Routes>
+            </BrowserRouter>
+        </AppProvider>
+    );
 }
 
 export default App;
