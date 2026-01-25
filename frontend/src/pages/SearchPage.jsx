@@ -1,151 +1,394 @@
 import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { PageLayout } from '../components/layout';
-import { SearchForm } from '../components/forms';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import {
+    Search, Calendar, DollarSign, Clock, Filter, X,
+    ChevronRight, MapPin, ArrowUpDown
+} from 'lucide-react';
+import Navbar from '../components/layout/Navbar';
+import Footer from '../components/layout/Footer';
+import { searchAPI } from '../services/api';
 
-const SearchPage = () => {
-    const [searchParams] = useSearchParams();
+export default function SearchPage() {
+    const [filters, setFilters] = useState({
+        fromDate: '',
+        toDate: '',
+        minCost: '',
+        maxCost: '',
+        minDays: '',
+        maxDays: '',
+    });
     const [results, setResults] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
+    const [sortBy, setSortBy] = useState('date');
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-    // Sample search results - will be replaced by API calls
-    const sampleResults = [
-        { id: 1, tourCode: 'KSM-001', title: 'Kashmir Paradise Explorer', location: 'Srinagar', startDate: '2026-02-15', endDate: '2026-02-21', duration: '6N/7D', price: 25000 },
-        { id: 2, tourCode: 'KSM-002', title: 'Dal Lake Houseboat Special', location: 'Dal Lake, Srinagar', startDate: '2026-02-18', endDate: '2026-02-22', duration: '4N/5D', price: 18000 },
-        { id: 3, tourCode: 'KRL-001', title: 'Kerala Backwaters Cruise', location: 'Alleppey', startDate: '2026-02-20', endDate: '2026-02-26', duration: '6N/7D', price: 28000 },
-        { id: 4, tourCode: 'GOA-001', title: 'Goa Beach Holiday', location: 'North Goa', startDate: '2026-02-22', endDate: '2026-02-26', duration: '4N/5D', price: 15000 },
-        { id: 5, tourCode: 'RAJ-001', title: 'Rajasthan Heritage Trail', location: 'Jaipur - Udaipur', startDate: '2026-03-01', endDate: '2026-03-08', duration: '7N/8D', price: 35000 },
-    ];
-
-    const handleSearch = (formData) => {
-        console.log('Search params:', formData);
-        // Simulate API call
-        setResults(sampleResults);
+    const handleSearch = async () => {
+        setIsLoading(true);
         setHasSearched(true);
+        try {
+            const params = {};
+            if (filters.fromDate) params.fromDate = filters.fromDate;
+            if (filters.toDate) params.toDate = filters.toDate;
+            if (filters.minCost) params.minCost = filters.minCost;
+            if (filters.maxCost) params.maxCost = filters.maxCost;
+            if (filters.minDays) params.minDays = filters.minDays;
+            if (filters.maxDays) params.maxDays = filters.maxDays;
+
+            const res = await searchAPI.searchTours(params);
+            if (res.data) {
+                setResults(Array.isArray(res.data) ? res.data : []);
+            } else {
+                setResults([]);
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            setResults([]);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    return (
-        <PageLayout>
-            <div className="search-page">
-                {/* Hero */}
-                <section className="search-hero">
-                    <div className="container">
-                        <h1>Find Your Perfect Tour</h1>
-                        <SearchForm onSearch={handleSearch} showFilters={true} />
-                    </div>
-                </section>
+    const handleReset = () => {
+        setFilters({
+            fromDate: '',
+            toDate: '',
+            minCost: '',
+            maxCost: '',
+            minDays: '',
+            maxDays: '',
+        });
+        setResults([]);
+        setHasSearched(false);
+    };
 
-                {/* Results */}
-                {hasSearched && (
-                    <section className="search-results">
-                        <div className="container">
-                            <div className="search-results-header">
-                                <p className="results-count">
-                                    Found <strong>{results.length}</strong> tours matching your criteria
-                                </p>
-                                <div className="flex gap-2">
-                                    <select className="form-input form-select" style={{ width: 'auto', padding: 'var(--spacing-2) var(--spacing-8) var(--spacing-2) var(--spacing-3)' }}>
-                                        <option value="relevance">Sort by Relevance</option>
-                                        <option value="price-low">Price: Low to High</option>
-                                        <option value="price-high">Price: High to Low</option>
-                                        <option value="date">Departure Date</option>
-                                    </select>
+    // Sort results
+    const sortedResults = [...results].sort((a, b) => {
+        switch (sortBy) {
+            case 'price-low':
+                return (a.cost || a.startingCost || 0) - (b.cost || b.startingCost || 0);
+            case 'price-high':
+                return (b.cost || b.startingCost || 0) - (a.cost || a.startingCost || 0);
+            case 'duration':
+                return parseInt(a.duration || '0') - parseInt(b.duration || '0');
+            case 'date':
+            default:
+                return new Date(a.startDate || a.departureDate || 0) - new Date(b.startDate || b.departureDate || 0);
+        }
+    });
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <div className="relative h-48 md:h-64 bg-gradient-dark">
+                <Navbar />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/80 to-purple-600/80" />
+                <div className="container mx-auto px-4 h-full flex items-end pb-8 relative z-10">
+                    <div>
+                        <h1 className="text-4xl font-bold text-white mb-2">Search Tours</h1>
+                        <p className="text-white/80">Find tour packages with our advanced filters</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="container mx-auto px-4 py-8">
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Filters Sidebar */}
+                    <aside className={`lg:w-80 shrink-0 ${isFiltersOpen ? 'fixed inset-0 z-50 bg-white overflow-auto lg:relative lg:bg-transparent' : 'hidden lg:block'}`}>
+                        {isFiltersOpen && (
+                            <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
+                                <h2 className="font-bold text-lg">Filters</h2>
+                                <button onClick={() => setIsFiltersOpen(false)} className="p-2">
+                                    <X size={24} />
+                                </button>
+                            </div>
+                        )}
+
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:sticky lg:top-24">
+                            <h3 className="font-bold text-lg text-gray-900 mb-6 flex items-center gap-2">
+                                <Filter size={20} /> Search Filters
+                            </h3>
+
+                            {/* Date Range */}
+                            <div className="mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <Calendar size={16} className="inline mr-1" /> Travel Period
+                                </label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-xs text-gray-500">From</label>
+                                        <input
+                                            type="date"
+                                            value={filters.fromDate}
+                                            onChange={(e) => setFilters({ ...filters, fromDate: e.target.value })}
+                                            className="input mt-1"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-gray-500">To</label>
+                                        <input
+                                            type="date"
+                                            value={filters.toDate}
+                                            onChange={(e) => setFilters({ ...filters, toDate: e.target.value })}
+                                            className="input mt-1"
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
-                            {results.map((tour) => (
-                                <div key={tour.id} className="result-card">
-                                    <div className="result-image">
-                                        <div style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            background: 'linear-gradient(135deg, var(--gray-200), var(--gray-300))',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}>
-                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" strokeWidth="1">
-                                                <rect x="3" y="3" width="18" height="18" rx="2" />
-                                                <circle cx="8.5" cy="8.5" r="1.5" />
-                                                <polyline points="21 15 16 10 5 21" />
-                                            </svg>
-                                        </div>
+                            {/* Cost Range */}
+                            <div className="mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <DollarSign size={16} className="inline mr-1" /> Budget Range (₹)
+                                </label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-xs text-gray-500">Min</label>
+                                        <input
+                                            type="number"
+                                            placeholder="10,000"
+                                            value={filters.minCost}
+                                            onChange={(e) => setFilters({ ...filters, minCost: e.target.value })}
+                                            className="input mt-1"
+                                        />
                                     </div>
-
-                                    <div className="result-info">
-                                        <span className="badge badge-primary mb-2">{tour.tourCode}</span>
-                                        <h3>{tour.title}</h3>
-                                        <p>
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }}>
-                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                                                <circle cx="12" cy="10" r="3" />
-                                            </svg>
-                                            {tour.location}
-                                        </p>
-                                        <div className="result-meta">
-                                            <span>
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '4px' }}>
-                                                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                                </svg>
-                                                {new Date(tour.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} - {new Date(tour.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                            </span>
-                                            <span>
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '4px' }}>
-                                                    <circle cx="12" cy="12" r="10" />
-                                                    <polyline points="12 6 12 12 16 14" />
-                                                </svg>
-                                                {tour.duration}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div className="result-action">
-                                        <div className="text-right mb-2">
-                                            <span className="text-tertiary" style={{ fontSize: 'var(--font-size-sm)' }}>Starting from</span>
-                                            <p style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--primary-600)' }}>
-                                                ₹{tour.price.toLocaleString()}
-                                            </p>
-                                            <span className="text-tertiary" style={{ fontSize: 'var(--font-size-xs)' }}>per person</span>
-                                        </div>
-                                        <Link to={`/tour/${tour.id}`} className="btn btn-primary">
-                                            Get Details
-                                        </Link>
+                                    <div>
+                                        <label className="text-xs text-gray-500">Max</label>
+                                        <input
+                                            type="number"
+                                            placeholder="50,000"
+                                            value={filters.maxCost}
+                                            onChange={(e) => setFilters({ ...filters, maxCost: e.target.value })}
+                                            className="input mt-1"
+                                        />
                                     </div>
                                 </div>
-                            ))}
+                            </div>
 
-                            {results.length === 0 && (
-                                <div className="text-center py-12">
-                                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" strokeWidth="1" style={{ margin: '0 auto 16px' }}>
-                                        <circle cx="11" cy="11" r="8" />
-                                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                                    </svg>
-                                    <h3 className="mb-2">No tours found</h3>
-                                    <p className="text-tertiary">Try adjusting your search filters</p>
+                            {/* Duration Range */}
+                            <div className="mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <Clock size={16} className="inline mr-1" /> Duration (Days)
+                                </label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-xs text-gray-500">Min Days</label>
+                                        <input
+                                            type="number"
+                                            placeholder="3"
+                                            value={filters.minDays}
+                                            onChange={(e) => setFilters({ ...filters, minDays: e.target.value })}
+                                            className="input mt-1"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-gray-500">Max Days</label>
+                                        <input
+                                            type="number"
+                                            placeholder="15"
+                                            value={filters.maxDays}
+                                            onChange={(e) => setFilters({ ...filters, maxDays: e.target.value })}
+                                            className="input mt-1"
+                                        />
+                                    </div>
                                 </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="space-y-3">
+                                <button
+                                    onClick={handleSearch}
+                                    className="btn-primary w-full gap-2"
+                                    disabled={isLoading}
+                                >
+                                    <Search size={18} />
+                                    {isLoading ? 'Searching...' : 'Search Tours'}
+                                </button>
+                                <button
+                                    onClick={handleReset}
+                                    className="btn-secondary w-full"
+                                >
+                                    Reset Filters
+                                </button>
+                            </div>
+                        </div>
+                    </aside>
+
+                    {/* Results Area */}
+                    <main className="flex-1">
+                        {/* Results Header */}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                            <div>
+                                <h2 className="text-xl font-bold text-gray-900">
+                                    {hasSearched ? `${sortedResults.length} Tours Found` : 'Search for Tours'}
+                                </h2>
+                                <p className="text-gray-500 text-sm">
+                                    {hasSearched ? 'Showing results matching your criteria' : 'Use filters to search for tours'}
+                                </p>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={() => setIsFiltersOpen(true)}
+                                    className="lg:hidden btn-secondary px-4 py-2"
+                                >
+                                    <Filter size={18} className="mr-2" /> Filters
+                                </button>
+
+                                {hasSearched && results.length > 0 && (
+                                    <div className="flex items-center gap-2">
+                                        <ArrowUpDown size={16} className="text-gray-500" />
+                                        <select
+                                            value={sortBy}
+                                            onChange={(e) => setSortBy(e.target.value)}
+                                            className="input py-2 pl-3 pr-8"
+                                        >
+                                            <option value="date">Sort by Date</option>
+                                            <option value="price-low">Price: Low to High</option>
+                                            <option value="price-high">Price: High to Low</option>
+                                            <option value="duration">Duration</option>
+                                        </select>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Results Table/Cards */}
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            {!hasSearched ? (
+                                <div className="p-12 text-center">
+                                    <Search size={48} className="text-gray-300 mx-auto mb-4" />
+                                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Start Your Search</h3>
+                                    <p className="text-gray-500 mb-4">
+                                        Use the filters on the left to search for tour packages
+                                    </p>
+                                    <button onClick={handleSearch} className="btn-primary">
+                                        Search All Tours
+                                    </button>
+                                </div>
+                            ) : isLoading ? (
+                                <div className="p-8 text-center">
+                                    <div className="spinner mx-auto mb-4" />
+                                    <p className="text-gray-500">Searching for tours...</p>
+                                </div>
+                            ) : sortedResults.length === 0 ? (
+                                <div className="p-8 text-center">
+                                    <p className="text-gray-500 mb-4">No tours found matching your criteria.</p>
+                                    <button onClick={handleReset} className="btn-primary">
+                                        Reset Filters
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    {/* Table Header - Desktop */}
+                                    <div className="hidden md:grid grid-cols-12 gap-4 p-4 bg-gray-50 border-b border-gray-200 text-sm font-semibold text-gray-700">
+                                        <div className="col-span-4">Tour</div>
+                                        <div className="col-span-2 text-center">Start Date</div>
+                                        <div className="col-span-2 text-center">End Date</div>
+                                        <div className="col-span-2 text-center">Duration</div>
+                                        <div className="col-span-2 text-center">Cost</div>
+                                    </div>
+
+                                    {/* Results List */}
+                                    {sortedResults.map((tour, index) => (
+                                        <motion.div
+                                            key={tour.tourId || tour.id || index}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: index * 0.05 }}
+                                            className="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors"
+                                        >
+                                            {/* Desktop Row */}
+                                            <div className="hidden md:grid grid-cols-12 gap-4 p-4 items-center">
+                                                <div className="col-span-4 flex items-center gap-4">
+                                                    {tour.thumbnailPath && (
+                                                        <img
+                                                            src={tour.thumbnailPath}
+                                                            alt={tour.tourName}
+                                                            className="w-16 h-16 rounded-lg object-cover"
+                                                            onError={(e) => {
+                                                                e.target.style.display = 'none';
+                                                            }}
+                                                        />
+                                                    )}
+                                                    <div>
+                                                        <p className="font-semibold text-gray-900">{tour.tourName}</p>
+                                                        <p className="text-sm text-gray-500">{tour.tourCode}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="col-span-2 text-center text-gray-700">
+                                                    {tour.startDate ? new Date(tour.startDate).toLocaleDateString('en-IN', {
+                                                        day: 'numeric',
+                                                        month: 'short',
+                                                        year: 'numeric',
+                                                    }) : 'N/A'}
+                                                </div>
+                                                <div className="col-span-2 text-center text-gray-700">
+                                                    {tour.endDate ? new Date(tour.endDate).toLocaleDateString('en-IN', {
+                                                        day: 'numeric',
+                                                        month: 'short',
+                                                        year: 'numeric',
+                                                    }) : 'N/A'}
+                                                </div>
+                                                <div className="col-span-2 text-center">
+                                                    <span className="badge badge-primary">{tour.duration || 'N/A'}</span>
+                                                </div>
+                                                <div className="col-span-2 flex items-center justify-between">
+                                                    <span className="font-bold text-gray-900">₹{(tour.cost || tour.startingCost || 0).toLocaleString()}</span>
+                                                    <Link
+                                                        to={`/tour/${tour.tourId || tour.id}`}
+                                                        className="text-blue-600 font-medium hover:text-blue-700 flex items-center gap-1"
+                                                    >
+                                                        Details <ChevronRight size={16} />
+                                                    </Link>
+                                                </div>
+                                            </div>
+
+                                            {/* Mobile Card */}
+                                            <div className="md:hidden p-4">
+                                                <div className="flex gap-4">
+                                                    {tour.thumbnailPath && (
+                                                        <img
+                                                            src={tour.thumbnailPath}
+                                                            alt={tour.tourName}
+                                                            className="w-24 h-24 rounded-lg object-cover"
+                                                            onError={(e) => {
+                                                                e.target.style.display = 'none';
+                                                            }}
+                                                        />
+                                                    )}
+                                                    <div className="flex-1">
+                                                        <h3 className="font-semibold text-gray-900">{tour.tourName}</h3>
+                                                        <p className="text-sm text-gray-500 mb-2">{tour.tourCode}</p>
+                                                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                                                            <Calendar size={14} />
+                                                            <span>{tour.startDate ? new Date(tour.startDate).toLocaleDateString('en-IN') : 'N/A'}</span>
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="badge badge-primary">{tour.duration || 'N/A'}</span>
+                                                            <span className="font-bold text-lg text-gray-900">₹{(tour.cost || tour.startingCost || 0).toLocaleString()}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <Link
+                                                    to={`/tour/${tour.tourId || tour.id}`}
+                                                    className="btn-primary w-full mt-4"
+                                                >
+                                                    Get Details
+                                                </Link>
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </>
                             )}
                         </div>
-                    </section>
-                )}
-
-                {!hasSearched && (
-                    <section className="container py-16">
-                        <div className="text-center">
-                            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--gray-300)" strokeWidth="1" style={{ margin: '0 auto 24px' }}>
-                                <circle cx="11" cy="11" r="8" />
-                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                            </svg>
-                            <h2 className="mb-4">Search for your dream destination</h2>
-                            <p className="text-tertiary">Use the search form above to find tours that match your preferences</p>
-                        </div>
-                    </section>
-                )}
+                    </main>
+                </div>
             </div>
-        </PageLayout>
-    );
-};
 
-export default SearchPage;
+            <Footer />
+        </div>
+    );
+}
