@@ -1,33 +1,27 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getCustomerName, subscribeToAuthChanges, logout as authLogout } from "../utils/auth";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [customerName, setCustomerName] = useState(
-    localStorage.getItem("customerName")
-  );
+  const [customerName, setCustomerName] = useState(getCustomerName());
 
   useEffect(() => {
-    const handleStorageChange = () => {
-      setCustomerName(localStorage.getItem("customerName"));
-    };
+    const unsubscribe = subscribeToAuthChanges(() => {
+      setCustomerName(getCustomerName());
+    });
 
-    window.addEventListener("storage", handleStorageChange);
-    handleStorageChange();
-
-    return () =>
-      window.removeEventListener("storage", handleStorageChange);
+    return () => unsubscribe();
   }, []);
 
   const logout = () => {
-    localStorage.clear();
-    setCustomerName(null);
+    authLogout();
     navigate("/");
   };
 
   return (
     <nav className="flex justify-between items-center px-6 py-3 bg-gray-900 text-white">
-      
+
       {/* Logo */}
       <h2
         onClick={() => navigate("/")}

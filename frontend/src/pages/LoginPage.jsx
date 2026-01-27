@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { loginCustomer } from '../api/customerApi';
+import { login } from '../utils/auth';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -33,8 +34,8 @@ const LoginPage = () => {
         password: formData.password
       });
 
-      localStorage.setItem("customerId", response.customerId);
-      localStorage.setItem("customerName", response.name);
+      // Use central auth utility to handle storage and events
+      login(response);
 
       const redirectTo = location.state?.from?.pathname || "/";
       navigate(redirectTo, { replace: true });

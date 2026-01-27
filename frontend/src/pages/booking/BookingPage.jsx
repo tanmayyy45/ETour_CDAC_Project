@@ -35,7 +35,10 @@ const BookingPage = () => {
             state: {
                 catmasterId,
                 departureDateId,
-                tourName: tour.tourName
+                catmasterId,
+                departureDateId,
+                tourName: tour.tourName,
+                tourId: tour.tourId || tour.id
             }
         });
     };

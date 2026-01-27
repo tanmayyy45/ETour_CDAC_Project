@@ -28,9 +28,16 @@ const PassengerForm = () => {
       return;
     }
 
+    const customerId = Number(localStorage.getItem("customerId"));
+    if (!customerId) {
+      alert("Your session has expired or is invalid. Please login again.");
+      window.location.href = "/login";
+      return;
+    }
+
     try {
       const payload = {
-        customerId: Number(localStorage.getItem("customerId")), // booking owner
+        customerId: customerId, // booking owner
         tourId: state.tourId,
         departureDateId: state.departureDateId,
         roomPreference: "AUTO",
@@ -68,12 +75,8 @@ const PassengerForm = () => {
 
           <input
             type="date"
-            className="border p-2"
             value={p.dob}
-            onChange={e =>
-              handlePassengerChange(i, "dob", e.target.value)
-            }
-            required
+            onChange={e => handlePassengerChange(i, "dob", e.target.value)}
           />
         </div>
       ))}
