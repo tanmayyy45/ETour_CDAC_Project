@@ -1,42 +1,38 @@
-import axios from "axios";
-
-const BOOKING_URL = "http://localhost:8080/api/bookings";
-const PAYMENT_URL = "http://localhost:8080/api/razorpay";
-const INVOICE_URL = "http://localhost:8080/api/invoices";
+import apiClient from "./client";
 
 // ========== BOOKING ENDPOINTS ==========
 
 export const createBooking = (payload) => {
-  return axios.post(`${BOOKING_URL}/create`, payload);
+  return apiClient.post('/bookings/create', payload);
 };
 
 export const getBookingById = (bookingId) => {
-  return axios.get(`${BOOKING_URL}/${bookingId}`);
+  return apiClient.get(`/bookings/${bookingId}`);
 };
 
 export const getBookingsByCustomer = (customerId) => {
-  return axios.get(`${BOOKING_URL}/customer/${customerId}`);
+  return apiClient.get(`/bookings/customer/${customerId}`);
 };
 
 export const getAllBookings = () => {
-  return axios.get(BOOKING_URL);
+  return apiClient.get('/bookings');
 };
 
 export const cancelBooking = (bookingId) => {
-  return axios.delete(`${BOOKING_URL}/${bookingId}`);
+  return apiClient.delete(`/bookings/${bookingId}`);
 };
 
 // ========== PAYMENT ENDPOINTS ==========
 
 export const createRazorpayOrder = (bookingId, amount) => {
-  return axios.post(`${PAYMENT_URL}/create-order`, {
+  return apiClient.post('/razorpay/create-order', {
     bookingId: bookingId,
     amount: amount,
   });
 };
 
 export const verifyPayment = (paymentData) => {
-  return axios.post(`${PAYMENT_URL}/verify-payment`, {
+  return apiClient.post('/razorpay/verify-payment', {
     bookingId: paymentData.bookingId,
     razorpayOrderId: paymentData.razorpay_order_id,
     razorpayPaymentId: paymentData.razorpay_payment_id,
@@ -47,11 +43,11 @@ export const verifyPayment = (paymentData) => {
 // ========== INVOICE ENDPOINTS ==========
 
 export const downloadInvoice = (bookingId) => {
-  return axios.get(`${INVOICE_URL}/${bookingId}/download`, {
+  return apiClient.get(`/invoices/${bookingId}/download`, {
     responseType: "blob",
   });
 };
 
 export const resendInvoiceEmail = (bookingId) => {
-  return axios.post(`${INVOICE_URL}/${bookingId}/resend-email`);
+  return apiClient.post(`/invoices/${bookingId}/resend-email`);
 };

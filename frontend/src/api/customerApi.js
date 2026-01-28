@@ -1,23 +1,21 @@
-import axios from "axios";
-
-const BASE_URL = "http://localhost:8080/api/customers";
+import apiClient from "./client";
 
 export const registerCustomer = (customerData) => {
-  return axios.post(`${BASE_URL}/register`, customerData)
+  return apiClient.post('/auth/register', customerData)
     .then(res => res.data);
 };
 
 export const loginCustomer = (loginData) => {
-  return axios.post(`${BASE_URL}/login`, loginData)
+  return apiClient.post('/auth/login', loginData)
     .then(res => res.data);
 };
 
 export const getCustomerById = (id) => {
-  return axios.get(`${BASE_URL}/${id}`)
+  return apiClient.get(`/customers/${id}`)
     .then(res => res.data);
 };
 
 export const updateCustomer = (id, customerData) => {
-  return axios.put(`${BASE_URL}/${id}`, customerData)
+  return apiClient.put(`/customers/${id}`, customerData)
     .then(res => res.data);
 };

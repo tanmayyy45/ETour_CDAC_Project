@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { loginCustomer } from '../api/customerApi';
 import { login } from '../utils/auth';
@@ -16,6 +16,39 @@ const LoginPage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Handle Google OAuth2 Redirect
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+
+    if (token) {
+      // Decode token to get user info (simple decode, not validation)
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        const decoded = JSON.parse(jsonPayload);
+
+        const authData = {
+          token: token,
+          id: decoded.userId || decoded.sub, // Use userId from claim, fallback to sub (likely email) only if missing
+          name: decoded.name || decoded.firstName || "User",
+          email: decoded.sub // 'sub' is the email in our JwtUtils
+        };
+
+        login(authData);
+        navigate('/', { replace: true });
+      } catch (e) {
+        console.error("Failed to process Google login token", e);
+        setError("Google login failed");
+      }
+    }
+  }, [location, navigate]);
+
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -47,6 +80,10 @@ const LoginPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:8080/oauth2/authorization/google";
   };
 
   return (
@@ -87,6 +124,22 @@ const LoginPage = () => {
               {error}
             </div>
           )}
+
+          <div className="space-y-4">
+            {/* Google Login Button */}
+            <button
+              onClick={handleGoogleLogin}
+              className="w-full py-3 px-4 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl transition-all hover:bg-gray-50 hover:shadow-md flex items-center justify-center gap-3"
+            >
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+              Sign in with Google
+            </button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200"></div></div>
+              <div className="relative flex justify-center text-sm"><span className="px-2 bg-white text-gray-500">Or sign in with email</span></div>
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
@@ -140,8 +193,7 @@ const LoginPage = () => {
           </form>
 
           <div className="relative">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200"></div></div>
-            <div className="relative flex justify-center text-sm"><span className="px-2 bg-white text-gray-500">Or</span></div>
+            {/* Removed the 'Or' divider here as we moved it up */}
           </div>
 
           <p className="text-center text-sm text-gray-600">

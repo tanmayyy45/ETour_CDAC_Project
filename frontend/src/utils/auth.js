@@ -13,7 +13,14 @@ export const getCustomerName = () => {
   return localStorage.getItem("customerName");
 };
 
+export const getAuthToken = () => {
+  return localStorage.getItem("token");
+};
+
 export const login = (data) => {
+  if (data.token) {
+    localStorage.setItem("token", data.token);
+  }
   localStorage.setItem("customerId", data.id || data.customerId); // Handle both id formats just in case
   localStorage.setItem("customerName", data.name);
 
