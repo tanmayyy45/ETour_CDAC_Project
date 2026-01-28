@@ -1,0 +1,34 @@
+package com.etour.app.dto;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+public class SearchResultDTO {
+    private Integer tourId;
+    private String tourName;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private Integer duration;
+    private BigDecimal tourCost;
+    public SearchResultDTO(Integer tourId, String tourName, LocalDate startDate, LocalDate endDate, Integer duration, BigDecimal tourCost) {
+        this.tourId = tourId;
+        this.tourName = tourName;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.duration = duration;
+        this.tourCost = tourCost;
+    }
+    public SearchResultDTO() {}
+    // Getters and Setters
+    public Integer getTourId() { return tourId; }
+    public void setTourId(Integer tourId) { this.tourId = tourId; }
+    public String getTourName() { return tourName; }
+    public void setTourName(String tourName) { this.tourName = tourName; }
+    public LocalDate getStartDate() { return startDate; }
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+    public LocalDate getEndDate() { return endDate; }
+    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
+    public Integer getDuration() { return duration; }
+    public void setDuration(Integer duration) { this.duration = duration; }
+    public BigDecimal getTourCost() { return tourCost; }
+    public void setTourCost(BigDecimal tourCost) { this.tourCost = tourCost; }
+}

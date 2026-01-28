@@ -1,15 +1,13 @@
 package com.etour.app.service.impl;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.etour.app.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.etour.app.dto.CostDTO;
-import com.etour.app.dto.DepartureDateDTO;
-import com.etour.app.dto.ItineraryResponseDTO;
-import com.etour.app.dto.TourDTO;
 import com.etour.app.entity.CategoryMaster;
 import com.etour.app.entity.CostMaster;
 import com.etour.app.entity.DepartureDateMaster;
@@ -115,6 +113,21 @@ public class TourServiceImpl implements TourService
 
         return dto;
     }
+
+	@Override
+	public List<SearchResultDTO> searchToursByDate(LocalDate from, LocalDate to) {
+		return tourRepository.findToursByDateRange(from, to);
+	}
+
+	@Override
+	public List<SearchResultDTO> searchToursByDuration(Integer min, Integer max) {
+		return tourRepository.findToursByDuration(min, max);
+	}
+
+	@Override
+	public List<SearchResultDTO> searchToursByCost(BigDecimal min, BigDecimal max) {
+		return tourRepository.findToursByCost(min, max);
+	}
 
 
 }
