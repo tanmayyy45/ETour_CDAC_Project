@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.etour.app.dto.CategoryClickResponseDTO;
 import com.etour.app.entity.CategoryMaster;
 import com.etour.app.service.CategoryService;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -31,15 +34,38 @@ public class CategoryController {
 
 	@GetMapping("/search")
 	public ResponseEntity<List<CategoryMaster>> searchCategories(
-			@org.springframework.web.bind.annotation.RequestParam(required = false) String query,
-			@org.springframework.web.bind.annotation.RequestParam(required = false) Double minBudget,
-			@org.springframework.web.bind.annotation.RequestParam(required = false) Double maxBudget,
-			@org.springframework.web.bind.annotation.RequestParam(required = false) Integer minDays,
-			@org.springframework.web.bind.annotation.RequestParam(required = false) Integer maxDays,
-			@org.springframework.web.bind.annotation.RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate startDate,
-			@org.springframework.web.bind.annotation.RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate endDate) {
+			@RequestParam(required = false) String query,
+			@RequestParam(required = false) Double minBudget,
+			@RequestParam(required = false) Double maxBudget,
+			@RequestParam(required = false) Integer minDays,
+			@RequestParam(required = false) Integer maxDays,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
 		return ResponseEntity.ok(
 				categoryService.searchCategories(query, minBudget, maxBudget, minDays, maxDays, startDate, endDate));
+	}
+
+	@GetMapping("/all")
+	public ResponseEntity<List<CategoryMaster>> getAllCategories() {
+		return ResponseEntity.ok(categoryService.getAllCategories());
+	}
+
+	@PostMapping
+	public ResponseEntity<CategoryMaster> createCategory(@RequestBody CategoryMaster category) {
+		return ResponseEntity.ok(categoryService.saveCategory(category));
+	}
+
+	@PutMapping("/{categoryId}")
+	public ResponseEntity<CategoryMaster> updateCategory(@PathVariable String categoryId,
+			@RequestBody CategoryMaster category) {
+		category.setCategoryId(categoryId);
+		return ResponseEntity.ok(categoryService.saveCategory(category));
+	}
+
+	@DeleteMapping("/{categoryId}")
+	public ResponseEntity<String> deleteCategory(@PathVariable String categoryId) {
+		categoryService.deleteCategory(categoryId);
+		return ResponseEntity.ok("Category deleted successfully");
 	}
 }

@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.etour.app.entity.CustomerMaster;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public interface CustomerService {
     CustomerMaster registerCustomer(CustomerMaster customer);
 
@@ -16,4 +18,6 @@ public interface CustomerService {
     void deleteCustomer(Integer id);
 
     CustomerMaster loginCustomer(String email, String password);
+
+    List<CustomerMaster> parseExcel(MultipartFile file);
 }

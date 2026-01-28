@@ -56,6 +56,20 @@ public class TourServiceImpl implements TourService {
 
 	@Override
 	public TourMaster addTour(TourMaster tourMaster) {
+		if (tourMaster.getCatmaster() != null && tourMaster.getCatmaster().getCategoryId() != null) {
+			categoryRepository.findByCategoryId(tourMaster.getCatmaster().getCategoryId())
+					.ifPresent(tourMaster::setCatmaster);
+		}
+		return tourRepository.save(tourMaster);
+	}
+
+	@Override
+	public TourMaster updateTour(int id, TourMaster tourMaster) {
+		tourMaster.setId(id);
+		if (tourMaster.getCatmaster() != null && tourMaster.getCatmaster().getCategoryId() != null) {
+			categoryRepository.findByCategoryId(tourMaster.getCatmaster().getCategoryId())
+					.ifPresent(tourMaster::setCatmaster);
+		}
 		return tourRepository.save(tourMaster);
 	}
 

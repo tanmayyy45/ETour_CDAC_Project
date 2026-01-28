@@ -46,6 +46,7 @@ public class AuthController {
         claims.put("userId", savedCustomer.getId());
         claims.put("name", savedCustomer.getName());
         claims.put("firstName", savedCustomer.getName() != null ? savedCustomer.getName().split(" ")[0] : "User");
+        claims.put("role", savedCustomer.getRole());
 
         String token = jwtUtils.generateToken(savedCustomer.getEmail(), claims);
 
@@ -53,7 +54,8 @@ public class AuthController {
                 token,
                 savedCustomer.getId(),
                 savedCustomer.getName(),
-                savedCustomer.getEmail()));
+                savedCustomer.getEmail(),
+                savedCustomer.getRole()));
     }
 
     @PostMapping("/login")
@@ -70,6 +72,7 @@ public class AuthController {
         claims.put("firstName",
                 userDetails.getCustomer().getName() != null ? userDetails.getCustomer().getName().split(" ")[0]
                         : "User");
+        claims.put("role", userDetails.getCustomer().getRole());
 
         String token = jwtUtils.generateToken(userDetails.getUsername(), claims);
 
@@ -77,6 +80,7 @@ public class AuthController {
                 token,
                 userDetails.getCustomer().getId(),
                 userDetails.getCustomer().getName(),
-                userDetails.getCustomer().getEmail()));
+                userDetails.getCustomer().getEmail(),
+                userDetails.getCustomer().getRole()));
     }
 }

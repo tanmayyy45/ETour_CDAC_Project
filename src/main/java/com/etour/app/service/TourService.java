@@ -24,4 +24,6 @@ public interface TourService {
     List<SearchResultDTO> searchToursByDuration(Integer min, Integer max);
 
     List<SearchResultDTO> searchToursByCost(BigDecimal min, BigDecimal max);
+
+    TourMaster updateTour(int id, TourMaster tourMaster);
 }

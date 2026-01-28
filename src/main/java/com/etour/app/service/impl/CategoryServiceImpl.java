@@ -60,4 +60,26 @@ public class CategoryServiceImpl implements CategoryService {
 				endDate);
 	}
 
+	@Override
+	public List<CategoryMaster> getAllCategories() {
+		return categoryRepository.findAll();
+	}
+
+	@Override
+	public CategoryMaster saveCategory(CategoryMaster category) {
+		if (category.getId() == null && category.getCategoryId() != null) {
+			categoryRepository.findByCategoryId(category.getCategoryId()).ifPresent(existing -> {
+				category.setId(existing.getId());
+			});
+		}
+		return categoryRepository.save(category);
+	}
+
+	@Override
+	public void deleteCategory(String categoryId) {
+		CategoryMaster cat = categoryRepository.findByCategoryId(categoryId)
+				.orElseThrow(() -> new RuntimeException("Category not found"));
+		categoryRepository.delete(cat);
+	}
+
 }

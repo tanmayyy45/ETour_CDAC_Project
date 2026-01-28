@@ -37,6 +37,9 @@ public class CustomerMaster {
     @Column(name = "reset_password_token_expiry")
     private java.time.LocalDateTime resetPasswordTokenExpiry;
 
+    @Column(name = "role", length = 20)
+    private String role = "CUSTOMER";
+
     public Integer getId() {
         return id;
     }
@@ -115,5 +118,13 @@ public class CustomerMaster {
 
     public void setResetPasswordTokenExpiry(java.time.LocalDateTime resetPasswordTokenExpiry) {
         this.resetPasswordTokenExpiry = resetPasswordTokenExpiry;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

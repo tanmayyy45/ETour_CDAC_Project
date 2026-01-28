@@ -5,12 +5,22 @@ public class AuthResponse {
     private Integer customerId;
     private String name;
     private String email;
+    private String role;
 
-    public AuthResponse(String token, Integer customerId, String name, String email) {
+    public AuthResponse(String token, Integer customerId, String name, String email, String role) {
         this.token = token;
         this.customerId = customerId;
         this.name = name;
         this.email = email;
+        this.role = role;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getToken() {
