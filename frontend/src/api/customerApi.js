@@ -11,3 +11,13 @@ export const loginCustomer = (loginData) => {
   return axios.post(`${BASE_URL}/login`, loginData)
     .then(res => res.data);
 };
+
+export const getCustomerById = (id) => {
+  return axios.get(`${BASE_URL}/${id}`)
+    .then(res => res.data);
+};
+
+export const updateCustomer = (id, customerData) => {
+  return axios.put(`${BASE_URL}/${id}`, customerData)
+    .then(res => res.data);
+};

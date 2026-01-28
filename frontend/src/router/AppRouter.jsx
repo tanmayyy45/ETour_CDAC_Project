@@ -16,6 +16,8 @@ import BookingDetailsPage from "../pages/BookingDetailsPage";
 import RequireLogin from "../components/RequireLogin";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import ProfilePage from "../pages/ProfilePage";
 import Navbar from "../components/Navbar";
 
 
@@ -48,6 +50,8 @@ export default function AppRouter() {
 
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
 
         <Route path="/booking/passengers" element={<PassengerForm />} />
         <Route path="/booking/:bookingId/passengers" element={<PassengerForm />} />
