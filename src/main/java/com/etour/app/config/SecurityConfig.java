@@ -45,7 +45,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/auth/**", "/api/customers/register",
                                                                 "/api/customers/login",
                                                                 "/api/i18n/**", "/login/oauth2/**", "/oauth2/**",
-                                                                "/images/**")
+                                                                "/images/**", "/actuator/**")
                                                 .permitAll()
 
                                                 // Public Browsing Endpoints (GET Only)

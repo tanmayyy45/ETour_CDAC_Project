@@ -2,7 +2,7 @@ package com.etour.app.controller;
 
 import com.etour.app.entity.CustomerMaster;
 import com.etour.app.repository.CustomerRepository;
-import com.etour.app.service.EmailService;
+import com.etour.app.email.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +23,7 @@ public class ForgotPasswordController {
 
     @Autowired
     private EmailService emailService;
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -38,14 +38,14 @@ public class ForgotPasswordController {
 
         CustomerMaster customer = customerOpt.get();
         String token = UUID.randomUUID().toString();
-        
+
         customer.setResetPasswordToken(token);
         customer.setResetPasswordTokenExpiry(LocalDateTime.now().plusMinutes(15));
         customerRepository.save(customer);
 
         String resetLink = "http://localhost:5173/reset-password?token=" + token;
         System.out.println("DEBUG: Password Reset Link: " + resetLink);
-        
+
         try {
             emailService.sendPasswordResetEmail(customer.getEmail(), resetLink);
         } catch (Exception e) {
