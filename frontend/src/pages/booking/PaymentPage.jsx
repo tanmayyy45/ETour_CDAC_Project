@@ -58,6 +58,13 @@ const PaymentPage = () => {
         return;
       }
 
+      // Validate customer data exists
+      if (!customerName || !customerEmail) {
+        setError("Customer information is incomplete. Please refresh and try again.");
+        setProcessingPayment(false);
+        return;
+      }
+
       // Step 2: Prepare Razorpay Options
       const options = {
         key: RAZORPAY_KEY_ID,

@@ -18,9 +18,9 @@ import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
-import DestinationsPage from "../pages/DestinationsPage";
 import ProfilePage from "../pages/ProfilePage";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 // Admin Imports
 import AdminLayout from '../components/admin/AdminLayout';
@@ -44,7 +44,6 @@ const MainContent = () => {
       {!isAdmin && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/destinations" element={<DestinationsPage />} />
         <Route path="/categories/:categoryId" element={<CategoryPage />} />
 
         {/* <Route path="/tours/:catmasterId" element={<TourDetails />} /> */}
@@ -107,6 +106,7 @@ const MainContent = () => {
         </Route>
 
       </Routes>
+      {!isAdmin && <Footer />}
     </>
   );
 };

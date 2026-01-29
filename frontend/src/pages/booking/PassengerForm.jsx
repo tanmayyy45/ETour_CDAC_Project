@@ -42,9 +42,31 @@ const PassengerForm = () => {
     }
 
     // Validate inputs
-    for (const p of passengers) {
+    for (let i = 0; i < passengers.length; i++) {
+      const p = passengers[i];
+
       if (!p.name || !p.dob) {
-        alert("Please fill in all passenger details.");
+        alert(`Please fill in all details for Passenger ${i + 1}`);
+        return;
+      }
+
+      // Validate name (at least 2 characters)
+      if (p.name.trim().length < 2) {
+        alert(`Passenger ${i + 1}: Please enter a valid name`);
+        return;
+      }
+
+      // Validate date of birth (not in future)
+      const dobDate = new Date(p.dob);
+      const today = new Date();
+      if (dobDate > today) {
+        alert(`Passenger ${i + 1}: Date of birth cannot be in the future`);
+        return;
+      }
+
+      // Check if passenger is born (simple future check covers it, but ensuring valid date)
+      if (isNaN(dobDate.getTime())) {
+        alert(`Passenger ${i + 1}: Invalid date of birth`);
         return;
       }
     }

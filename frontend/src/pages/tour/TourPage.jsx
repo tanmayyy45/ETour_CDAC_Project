@@ -48,7 +48,7 @@ const TourPage = () => {
                 <p className="text-xs text-gray-400 mt-1">per person</p>
 
                 <button
-                  onClick={() => navigate('book')}
+                  onClick={() => navigate(`/tours/${catmasterId}/book`)}
                   className="mt-6 w-full bg-emerald-600 text-white font-semibold py-3 rounded-xl hover:bg-emerald-700 transition shadow-lg shadow-emerald-500/20"
                 >
                   Book Now
