@@ -1,0 +1,72 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.metadata/
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+bin/
+
+
+# Local Spring Boot config
+application-local.properties
+
+# Logs
+booking.log
+
+# Test output
+test_output.txt
+
+.env
+
+# -----------------------------
+# Generated logs (ALL variants)
+# -----------------------------
+*.log
+*.log.*
+*.gz
+*.tmp
+
+# -----------------------------
+# Spring profiles (local/dev)
+# -----------------------------
+application-dev.properties
+
+# -----------------------------
+# Static images (if not versioned intentionally)
+# -----------------------------
+src/main/resources/static/images/
+
+# -----------------------------
+# OS junk
+# -----------------------------
+.DS_Store
+Thumbs.db
